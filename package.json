@@ -3,6 +3,10 @@
   "version": "1.9.1",
   "description": "Automatic script upload a directory content to a Mediative",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Cominweb/ftp-sync.git"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

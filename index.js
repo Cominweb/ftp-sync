@@ -100,7 +100,7 @@ var watcher = Chokidar.watch(settings.source, {
 
 // fn used to put datas on Mediative API
 var processing = {};
-function upload(pathInfo) {
+function upload(pathInfo, next) {
     // the file is already being processed?
     if (!_.isUndefined(processing[pathInfo.filepath])) {
         return;
@@ -151,6 +151,7 @@ function upload(pathInfo) {
                         console.info(settings.now() + '[Info] File cleaned successfully.'.green);
                     }
                 });
+                next();
             }, function (err, options) { // error :(
                 console.error(this.settings.now() + '[Error] Error happened while saving media on Mediative. More details follows.'.red);
                 console.error(Util.inspect(options));
@@ -227,8 +228,8 @@ watcher.on('error', function (error) {
                     }
                     var pathInfo = Path.parse(path);
                     pathInfo.filepath = path; // shortcut used in logs :)
-                    q.push(function (cb) {
-                        upload(pathInfo, cb);
+                    q.push(function (next) {
+                        upload(pathInfo, next);
                     });
                     q.start();
                 } catch (e) {

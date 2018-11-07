@@ -6,7 +6,7 @@ var Request = require('request'),
     Uniqid = require('./uniqid'),
     QString = require('query-string'),
     streamifier = require('streamifier'),
-    Fs = require('fs-ext');
+    Fs = require('fs');
 
 var Mediative = function (settings) {
     var self = this;

@@ -97,6 +97,22 @@ var watcher = Chokidar.watch(settings.source, {
     ignoreInitial: false // we do not want the initial files to be trated as added
 });
 
+if (process.env.FILTER) {
+    try {
+        var match = process.env.FILTER.match(new RegExp('^/(.*?)/([gimy]*)$'));
+        // sanity check here
+        var filter = new RegExp(match[1], match[2]);
+        if (settings.verbose) {
+            console.info(settings.now() + '[Info] Filtering files by name: '.cyan, process.env.FILTER.cyan);
+        }
+    } catch (e) {
+        console.error(settings.now() + '[Error] Cannot compile .env FILTER: '.red, process.env.FILTER.red);
+        console.error(settings.now() + '[Error] Please check your regular expression validity. '.red);
+        console.error(settings.now() + '[Error] Exiting. '.red);
+        process.exit(0);
+    }
+}
+
 
 // fn used to put datas on Mediative API
 var processing = {};
@@ -128,14 +144,14 @@ function upload(pathInfo, next) {
                 tags: '',
                 title: upload.title,
                 description: upload.title,
-                Upload: {id: upload.id},
+                Upload: { id: upload.id },
             };
 
-            if(process.env.PENDING) {
+            if (process.env.PENDING) {
                 mt_datas.approved = false;
             }
 
-            if(process.env.NOHLS) {
+            if (process.env.NOHLS) {
                 mt_datas.nohls = true;
             }
 
@@ -150,8 +166,8 @@ function upload(pathInfo, next) {
                 }
                 // var mid = media_datas.response.medias[0].Media.id;
                 // and now remove file
-                Fs.unlink(pathInfo.dir + Path.sep + pathInfo.base, function(err){
-                    if(err) {
+                Fs.unlink(pathInfo.dir + Path.sep + pathInfo.base, function (err) {
+                    if (err) {
                         console.error(this.settings.now() + '[Error] An error occured while trying to remove the source file. More details follow.'.red);
                         console.error(Util.inspect(err));
                     } else if (settings.verbose) {
@@ -181,10 +197,10 @@ watcher.on('error', function (error) {
     if (settings.verbose) {
         console.info(settings.now() + '[Info] Initial scan complete. Ready for changes.'.cyan);
     }
-    Fs.readdir(settings.source, function(err, files) {
-        if(!err) {
-            files.forEach(function(filename) {
-                touch(settings.source + Path.sep + filename, {nocreate: true});
+    Fs.readdir(settings.source, function (err, files) {
+        if (!err) {
+            files.forEach(function (filename) {
+                touch(settings.source + Path.sep + filename, { nocreate: true });
             });
         } else {
             console.error(settings.now() + '[Error] Cannot read source directory content for initial launch. Please check read permissions.')
@@ -196,6 +212,14 @@ watcher.on('error', function (error) {
     // so let's detect the last one, which is the more usefull to us
     var basename = Path.basename(path), ext = Path.extname(path);
     if (basename != Path.basename(settings.source) && !_.contains(watchedFiles, path) && !_.isEmpty(ext)) {
+        if(process.env.FILTER) {
+            if(!filter.test(basename)) {
+                if (settings.verbose) {
+                    console.info(settings.now() + '[Info] Filename does not match FILTER var: '.cyan, basename.cyan);
+                }
+                return;
+            }
+        }
         // the raw change event is triggered with the 'ftp' path when it concerns a file creation
         try {
             // the raw change event is triggered a first time, when the file begin to be written. It's also triggered when a file is deleted

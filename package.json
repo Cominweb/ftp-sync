@@ -1,6 +1,6 @@
 {
   "name": "mediative-ftp-sync",
-  "version": "1.9.5",
+  "version": "1.9.6",
   "description": "Automatic script upload a directory content to a Mediative",
   "main": "index.js",
   "repository": {

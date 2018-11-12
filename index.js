@@ -126,11 +126,18 @@ function upload(pathInfo, next) {
                 distant_datas: JSON.stringify({}),
                 thumbnails: JSON.stringify({}),
                 tags: '',
-                approved: false,
                 title: upload.title,
                 description: upload.title,
                 Upload: {id: upload.id},
             };
+
+            if(process.env.PENDING) {
+                mt_datas.approved = false;
+            }
+
+            if(process.env.NOHLS) {
+                mt_datas.nohls = true;
+            }
 
             if (settings.verbose) {
                 console.info(settings.now() + '[Info] Sending Mediative datas... '.cyan);

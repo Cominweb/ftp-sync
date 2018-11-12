@@ -209,7 +209,7 @@ var Mediative = function (settings) {
         var self = this;
         var filePath = fileInfos.filepath;
         var CHUNK_SIZE = 1 * 1024 * 1024, // 5MB
-            buffer = new Buffer(CHUNK_SIZE),
+            buffer = Buffer.alloc(CHUNK_SIZE),
             chunkNumber = 0;
         var fileSize = Fs.statSync(filePath).size;
         Fs.open(filePath, 'r', function (err, fd) {
